@@ -25,11 +25,7 @@ def super_encrypt(
         rsa_public, rsa_private = generate_keys()
     rsa_cipher = rsa_encrypt(vigenere_encrypted, rsa_public)
 
-    return (
-        vigenere_encrypted,
-        rsa_cipher,
-        rsa_public,
-    )
+    return rsa_cipher
 
 
 # Fungsi Super Decryption

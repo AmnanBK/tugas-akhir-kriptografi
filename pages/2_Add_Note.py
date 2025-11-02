@@ -4,6 +4,11 @@ from utils.encryption_utils import super_encrypt
 from datetime import datetime
 
 st.set_page_config(page_title="Tambah Catatan", layout="wide")
+caesar_key = int(st.session_state["user_settings"]["caesar_key"])
+vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+rsa_private = st.session_state["user_settings"]["rsa_private"]
+rsa_public = st.session_state["user_settings"]["rsa_public"]
+vault_key = st.session_state["user_settings"]["vault_key"]
 
 
 def logout():
@@ -61,8 +66,8 @@ def show_add_note_form():
 
         try:
             # Super encryption
-            encrypted_vigenere, encrypted_rsa, rsa_pub = super_encrypt(isi)
-            success = add_note(judul, encrypted_rsa, user_id, rsa_pub)
+            encrypted_content = super_encrypt(isi, caesar_key, vigenere_key, rsa_public)
+            success = add_note(judul, encrypted_content, user_id)
 
             if success:
                 st.success("✅ Catatan berhasil disimpan!")

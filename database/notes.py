@@ -5,7 +5,7 @@ from utils.encryption_utils import super_encrypt, super_decrypt
 
 
 # CREATE - Tambah Catatan
-def add_note(title: str, encrypted_content: str, user_id: int, key: str) -> bool:
+def add_note(title: str, encrypted_content: str, user_id: int) -> bool:
 
     try:
         with get_connection() as conn:
