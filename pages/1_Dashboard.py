@@ -65,10 +65,12 @@ def main():
 
         # Tombol aksi
         with cols[3]:
-            c1, c2 = st.columns(2)
+            c1, c2, c3 = st.columns(3)
             with c1:
-                st.button("✏️", key=f"edit_{note['id']}", help="Edit Catatan")
+                st.button("👁️", key=f"view{note['id']}", help="Lihat Catatan")
             with c2:
+                st.button("✏️", key=f"edit_{note['id']}", help="Edit Catatan")
+            with c3:
                 st.button("🗑️", key=f"del_{note['id']}", help="Hapus Catatan")
 
         st.markdown("<hr style='margin:2px 0;'>", unsafe_allow_html=True)
