@@ -55,12 +55,25 @@ def get_user_settings(user_id: int) -> dict | None:
             )
             row = cursor.fetchone()
             if row:
+                try:
+                    rsa_private = json.loads(row[3]) if row[3] else None
+                    rsa_public = json.loads(row[4]) if row[4] else None
+
+                    if isinstance(rsa_private, list):
+                        rsa_private = tuple(rsa_private)
+                    if isinstance(rsa_public, list):
+                        rsa_public = tuple(rsa_public)
+                except json.JSONDecodeError as e:
+                    print("JSON Decode Error (get_user_settings):", e)
+                    rsa_private = None
+                    rsa_public = None
+
                 return {
                     "id": row[0],
                     "caesar_key": row[1],
                     "vigenere_key": row[2],
-                    "rsa_private": row[3],
-                    "rsa_public": row[4],
+                    "rsa_private": rsa_private,
+                    "rsa_public": rsa_public,
                     "vault_key": row[5],
                 }
             return None
