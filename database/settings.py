@@ -1,18 +1,34 @@
 import sqlite3
+from crypto.rsa import generate_keys
 from database.db_connection import get_connection
+
+
+DEFAULT_CAESAR_KEY = 3
+DEFAULT_VIGENERE_KEY = "SECRET"
+DEFAULT_VAULT_KEY = "SECRET"
 
 
 # CREATE - Tambah / Inisialisasi Pengaturan Default untuk User Baru
 def create_user_settings(user_id: int) -> bool:
+    rsa_public, rsa_private = generate_keys()
+
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT OR IGNORE INTO settings (user_id, caesar_key, vigenere_key, rsa_private, rsa_public, vault_key)
-                VALUES (?, NULL, NULL, NULL, NULL, NULL)
+                INSERT OR IGNORE INTO settings
+                (user_id, caesar_key, vigenere_key, rsa_private, rsa_public, vault_key)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (user_id,),
+                (
+                    user_id,
+                    DEFAULT_CAESAR_KEY,
+                    DEFAULT_VIGENERE_KEY,
+                    rsa_private,
+                    rsa_public,
+                    DEFAULT_VAULT_KEY,
+                ),
             )
             conn.commit()
             return True
