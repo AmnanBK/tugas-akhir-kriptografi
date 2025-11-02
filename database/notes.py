@@ -5,9 +5,7 @@ from utils.encryption_utils import super_encrypt, super_decrypt
 
 
 # CREATE - Tambah Catatan
-def add_note(title: str, content: str, user_id: int, key: str) -> bool:
-
-    encrypted_content = super_encrypt(content, key)
+def add_note(title: str, encrypted_content: str, user_id: int, key: str) -> bool:
 
     try:
         with get_connection() as conn:
@@ -18,7 +16,7 @@ def add_note(title: str, content: str, user_id: int, key: str) -> bool:
                 INSERT INTO notes (title, encrypted_content, created_at, user_id)
                 VALUES (?, ?, ?, ?)
                 """,
-                (title, encrypted_content, created_at, user_id),
+                (title, str(encrypted_content), created_at, user_id),
             )
             conn.commit()
             return True

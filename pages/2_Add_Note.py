@@ -1,24 +1,28 @@
 import streamlit as st
-import pandas as pd
+from database.notes import add_note
+from utils.encryption_utils import super_encrypt
 from datetime import datetime
 
-def main():
-    st.set_page_config(page_title="Dashboard", layout="wide")
+st.set_page_config(page_title="Tambah Catatan", layout="wide")
 
-    # Simulasi login sementara
+
+def logout():
+    st.session_state.clear()
+    st.session_state["page"] = "login"
+    st.rerun()
+
+
+def show_sidebar():
     username = st.session_state.get("username", "UserDemo")
-
-    # Sidebar
     with st.sidebar:
         st.markdown("## 🔐 Secret Diary")
         st.write(f"👤 **{username}**")
-
         st.divider()
-        # Tombol navigasi
+
         if st.button("🏠 Dashboard", use_container_width=True):
             st.switch_page("pages/1_Dashboard.py")
         if st.button("📝 Tambah Catatan", use_container_width=True):
-            st.switch_page("pages/2_Add_Note.py")
+            st.rerun()
         if st.button("🔒 Brankas Pribadi", use_container_width=True):
             st.switch_page("pages/4_File_Vault.py")
         if st.button("🖼️ Galeri Rahasia", use_container_width=True):
@@ -28,14 +32,13 @@ def main():
 
         st.divider()
         if st.button("🚪 Logout", use_container_width=True):
-            st.session_state.clear()
-            st.switch_page("app.py")
+            logout()
 
-    # Tambah catatan
+
+def show_add_note_form():
     st.title("📝 Tambah Catatan")
     st.divider()
-    
-    # Form tambah catatan
+
     with st.form("add_note_form"):
         judul = st.text_input("🧾 Judul Catatan")
         isi = st.text_area("🖊️ Isi Catatan", height=200)
@@ -44,34 +47,46 @@ def main():
 
     if canceled:
         st.switch_page("pages/1_Dashboard.py")
+        return
 
     if submitted:
-        if not judul or not isi:
+        if not judul.strip() or not isi.strip():
             st.warning("⚠️ Judul dan isi catatan tidak boleh kosong!")
             return
 
-        # try:
-        #     # proses enkripsi
-        #     encrypted_text = super_encrypt(isi)
+        user_id = st.session_state.get("user_id")
+        if not user_id:
+            st.error("⚠️ User belum login!")
+            return
 
-        #     # simpan ke database
-        #     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #     user_id = st.session_state.get("user_id", 1)  # sementara default 1
-        #     insert_note(user_id, judul, encrypted_text, now)
+        try:
+            # Super encryption
+            encrypted_vigenere, encrypted_rsa, rsa_pub = super_encrypt(isi)
+            success = add_note(judul, encrypted_rsa, user_id, rsa_pub)
 
-        #     # tampilkan pesan sukses
-        #     st.success("✅ Catatan berhasil disimpan!")
-        #     st.session_state["new_note"] = {
-        #         "judul": judul,
-        #         "cipher": encrypted_text,
-        #         "tanggal": now
-        #     }
+            if success:
+                st.success("✅ Catatan berhasil disimpan!")
+                st.session_state["new_note"] = {
+                    "judul": judul,
+                    "tanggal": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                st.switch_page("pages/1_Dashboard.py")
+            else:
+                st.error("❌ Gagal menyimpan catatan!")
 
-        #     # redirect ke halaman detail
-        #     st.switch_page("pages/3_View_Note.py")
+        except Exception as e:
+            st.error(f"❌ Terjadi kesalahan saat menyimpan catatan: {e}")
 
-        # except Exception as e:
-        #     st.error(f"❌ Gagal menyimpan catatan: {e}")
+
+def main():
+    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+        st.warning("Silakan login terlebih dahulu!")
+        st.switch_page("app")
+        return
+
+    show_sidebar()
+    show_add_note_form()
+
 
 if __name__ == "__main__":
-    main() 
+    main()
