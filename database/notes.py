@@ -1,10 +1,14 @@
 import sqlite3
 from datetime import datetime
 from database.db_connection import get_connection
+from utils.encryption_utils import super_encrypt, super_decrypt
 
 
 # CREATE - Tambah Catatan
-def add_note(title: str, encrypted_content: str, user_id: int) -> bool:
+def add_note(title: str, content: str, user_id: int, key: str) -> bool:
+
+    encrypted_content = super_encrypt(content, key)
+
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -54,7 +58,7 @@ def get_all_notes(user_id: int) -> list:
 
 
 # READ - Ambil Catatan Berdasarkan ID
-def get_note_by_id(note_id: int, user_id: int) -> dict | None:
+def get_note_by_id(note_id: int, user_id: int, key: str) -> dict | None:
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -68,10 +72,12 @@ def get_note_by_id(note_id: int, user_id: int) -> dict | None:
             )
             row = cursor.fetchone()
             if row:
+                decrypted_content = super_decrypt(row[2], key)
+
                 return {
                     "id": row[0],
                     "title": row[1],
-                    "encrypted_content": row[2],
+                    "content": decrypted_content,
                     "created_at": row[3],
                 }
             return None
@@ -81,7 +87,8 @@ def get_note_by_id(note_id: int, user_id: int) -> dict | None:
 
 
 # UPDATE - Perbarui Catatan
-def update_note(note_id: int, title: str, encrypted_content: str, user_id: int) -> bool:
+def update_note(note_id: int, title: str, content: str, user_id: int, key: str) -> bool:
+    encrypted_content = super_encrypt(content, key)
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
