@@ -1,27 +1,29 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
+from database.notes import get_all_notes, get_note_by_id, delete_note
+from utils.encryption_utils import super_decrypt
+
+st.set_page_config(page_title="Dashboard", layout="wide")
 
 
-def main():
-    st.set_page_config(page_title="Dashboard", layout="wide")
+def logout():
+    st.session_state.clear()
+    st.session_state["page"] = "login"
+    st.rerun()
 
-    # Simulasi login sementara
+
+def show_sidebar():
     username = st.session_state.get("username", "UserDemo")
-
-    # Sidebar
     with st.sidebar:
         st.markdown("## 🔐 Secret Diary")
         st.write(f"👤 **{username}**")
-
         st.divider()
-        # Tombol navigasi
+
         if st.button("🏠 Dashboard", use_container_width=True):
-            st.switch_page("1_Dashboard.py")
+            st.rerun()
         if st.button("📝 Tambah Catatan", use_container_width=True):
-            st.switch_page("2_Add_Note.py")
+            st.switch_page("pages/2_Add_Note.py")
         if st.button("🔒 Brankas Pribadi", use_container_width=True):
-            st.switch_page("4_File_Vault.py")
+            st.switch_page("pages/4_File_Vault.py")
         if st.button("🖼️ Galeri Rahasia", use_container_width=True):
             st.switch_page("pages/5_Gallery.py")
         if st.button("⚙️ Pengaturan", use_container_width=True):
@@ -29,54 +31,70 @@ def main():
 
         st.divider()
         if st.button("🚪 Logout", use_container_width=True):
-            st.session_state.clear()
-            st.switch_page("app.py")
+            logout()
 
-    # Dashboard
+
+def show_dashboard():
+    username = st.session_state.get("username", "UserDemo")
+    user_id = st.session_state.get("user_id")
+
     st.title(f"📘 Dashboard - Selamat datang, {username}!")
     st.divider()
 
-    # Daftar catatan
+    notes = get_all_notes(user_id)
+    if not notes:
+        st.info("Belum ada catatan")
+        return
+
     header_cols = st.columns([0.5, 3, 2, 2])
     header_cols[0].markdown("**No**")
     header_cols[1].markdown("**Judul**")
     header_cols[2].markdown("**Tanggal**")
     header_cols[3].markdown("**Aksi**")
-
     st.markdown("<hr style='margin:4px 0;'>", unsafe_allow_html=True)
 
-    # Dummy data
-    notes = [
-        {"id": 1, "judul": "Catatan Rahasia A", "tanggal": "2025-11-02"},
-        {"id": 2, "judul": "Catatan Harian B", "tanggal": "2025-11-01"},
-        {"id": 3, "judul": "Daftar Ide", "tanggal": "2025-10-30"},
-    ]
-
-    if not notes:
-        st.info("Belum ada catatan")
-        return
-
-    # Loop isi tabel
     for i, note in enumerate(notes, 1):
         cols = st.columns([0.5, 3, 2, 2])
         cols[0].markdown(f"{i}")
-        cols[1].markdown(f"{note['judul']}")
-        cols[2].markdown(f"{note['tanggal']}")
+        cols[1].markdown(f"{note['title']}")
+        cols[2].markdown(f"{note['created_at']}")
 
-        # Tombol aksi
         with cols[3]:
             c1, c2, c3 = st.columns(3)
             with c1:
-                st.button("👁️", key=f"view{note['id']}", help="Lihat Catatan")
+                if st.button("👁️", key=f"view{note['id']}"):
+                    note_data = get_note_by_id(note["id"], user_id)
+                    if note_data:
+                        decrypted_content = super_decrypt(
+                            note_data["encrypted_content"], user_id
+                        )
+                        st.info(f"**{note_data['title']}**\n\n{decrypted_content}")
             with c2:
-                st.button("✏️", key=f"edit_{note['id']}", help="Edit Catatan")
+                if st.button("✏️", key=f"edit_{note['id']}"):
+                    st.session_state["edit_note_id"] = note["id"]
+                    st.switch_page("2_Add_Note")
             with c3:
-                st.button("🗑️", key=f"del_{note['id']}", help="Hapus Catatan")
+                if st.button("🗑️", key=f"del_{note['id']}"):
+                    if delete_note(note["id"], user_id):
+                        st.success(f"Catatan '{note['title']}' berhasil dihapus!")
+                        st.rerun()
+                    else:
+                        st.error("Gagal menghapus catatan!")
 
         st.markdown("<hr style='margin:2px 0;'>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.write("Klik tombol ✏️ untuk edit atau 🗑️ untuk hapus catatan.")
+
+
+def main():
+    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+        st.warning("Silakan login terlebih dahulu!")
+        st.switch_page("app")
+        return
+
+    show_sidebar()
+    show_dashboard()
 
 
 if __name__ == "__main__":
