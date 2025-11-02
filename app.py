@@ -1,6 +1,6 @@
 import streamlit as st
 from database.users import login_user, register_user
-from database.settings import create_user_settings
+from database.settings import get_user_settings
 
 st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="centered")
 
@@ -33,6 +33,13 @@ def show_login():
                 st.session_state["logged_in"] = True
                 st.session_state["username"] = user["username"]
                 st.session_state["user_id"] = user["id"]
+
+                settings = get_user_settings(user["id"])
+                if settings:
+                    st.session_state["user_settings"] = settings
+                else:
+                    st.session_state["user_settings"] = {}
+
                 st.rerun()
             else:
                 st.error("Username atau password salah!")
