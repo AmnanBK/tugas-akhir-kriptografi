@@ -3,6 +3,11 @@ from database.notes import get_all_notes, get_note_by_id, delete_note
 from utils.encryption_utils import super_decrypt
 
 st.set_page_config(page_title="Dashboard", layout="wide")
+caesar_key = int(st.session_state["user_settings"]["caesar_key"])
+vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+rsa_private = st.session_state["user_settings"]["rsa_private"]
+rsa_public = st.session_state["user_settings"]["rsa_public"]
+vault_key = st.session_state["user_settings"]["vault_key"]
 
 
 def logout():
@@ -63,12 +68,12 @@ def show_dashboard():
             c1, c2, c3 = st.columns(3)
             with c1:
                 if st.button("👁️", key=f"view{note['id']}"):
-                    note_data = get_note_by_id(note["id"], user_id)
-                    if note_data:
-                        decrypted_content = super_decrypt(
-                            note_data["encrypted_content"], user_id
-                        )
-                        st.info(f"**{note_data['title']}**\n\n{decrypted_content}")
+                    st.session_state["view_note"] = {
+                        "id": note["id"],
+                        "title": note["title"],
+                        "encrypted_content": note["encrypted_content"],
+                    }
+                    st.switch_page("pages/3_View_Note.py")
             with c2:
                 if st.button("✏️", key=f"edit_{note['id']}"):
                     st.session_state["edit_note_id"] = note["id"]
