@@ -11,7 +11,7 @@ def generate_key(plaintext: str, key: str) -> str:
     return key_extended
 
 
-def encrypt(plaintext: str, key: str) -> str:
+def encrypt_vigenere(plaintext: str, key: str) -> str:
     ciphertext = ""
     key_extended = generate_key(plaintext, key)
 
@@ -27,7 +27,7 @@ def encrypt(plaintext: str, key: str) -> str:
     return ciphertext
 
 
-def decrypt(ciphertext: str, key: str) -> str:
+def decrypt_vigenere(ciphertext: str, key: str) -> str:
     plaintext = ""
     key_extended = generate_key(ciphertext, key)
 

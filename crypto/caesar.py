@@ -1,4 +1,4 @@
-def encrypt(plaintext: str, shift: int) -> str:
+def encrypt_caesar(plaintext: str, shift: int) -> str:
     ciphertext = ""
     for char in plaintext:
         if char.isupper():
@@ -10,5 +10,5 @@ def encrypt(plaintext: str, shift: int) -> str:
     return ciphertext
 
 
-def decrypt(ciphertext: str, shift: int) -> str:
-    return encrypt(ciphertext, -shift)
+def decrypt_caesar(ciphertext: str, shift: int) -> str:
+    return encrypt_caesar(ciphertext, -shift)
