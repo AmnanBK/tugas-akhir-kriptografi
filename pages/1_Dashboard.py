@@ -72,7 +72,7 @@ def show_dashboard():
             with c2:
                 if st.button("✏️", key=f"edit_{note['id']}"):
                     st.session_state["edit_note_id"] = note["id"]
-                    st.switch_page("2_Add_Note")
+                    st.switch_page("pages/2_Add_Note.py")
             with c3:
                 if st.button("🗑️", key=f"del_{note['id']}"):
                     if delete_note(note["id"], user_id):
