@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from crypto.rsa import generate_keys
 from database.db_connection import get_connection
@@ -11,6 +12,8 @@ DEFAULT_VAULT_KEY = "SECRET"
 # CREATE - Tambah / Inisialisasi Pengaturan Default untuk User Baru
 def create_user_settings(user_id: int) -> bool:
     rsa_public, rsa_private = generate_keys()
+    rsa_public_str = json.dumps(rsa_public)
+    rsa_private_str = json.dumps(rsa_private)
 
     try:
         with get_connection() as conn:
@@ -25,8 +28,8 @@ def create_user_settings(user_id: int) -> bool:
                     user_id,
                     DEFAULT_CAESAR_KEY,
                     DEFAULT_VIGENERE_KEY,
-                    rsa_private,
-                    rsa_public,
+                    rsa_private_str,
+                    rsa_public_str,
                     DEFAULT_VAULT_KEY,
                 ),
             )
