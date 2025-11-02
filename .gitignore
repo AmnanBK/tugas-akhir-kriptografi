@@ -1,0 +1,73 @@
+# --- Python cache & build files ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# --- Virtual environments ---
+venv/
+.env/
+.venv/
+env/
+ENV/
+*.env
+
+# --- Editor / IDE specific ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# --- OS-generated files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Data & sensitive information ---
+# Local SQLite database (jangan commit)
+data/secret_diary.db
+
+# Encrypted user files & images
+data/files/*
+data/images/*
+
+# RSA keys & user encryption keys
+data/keys/*
+!data/keys/.gitkeep  # kalau kamu mau tetap jaga struktur foldernya
+
+# --- Logs ---
+database/logs.py
+*.log
+
+# --- Streamlit cache ---
+.streamlit/
+.streamlit/secrets.toml
+.streamlit/config.toml
+
+# --- Temporary & test files ---
+*.tmp
+*.bak
+*.old
+*.test
+*.log
+*.sqlite3
+
+# --- Environment variables ---
+.env
+.env.local
+.env.*.local
+
+# --- Jupyter / notebook (jika nanti dipakai) ---
+*.ipynb_checkpoints
+
+# --- OS backups ---
+*~
