@@ -1,10 +1,12 @@
 import sqlite3
 from database.db_connection import get_connection
+from database.settings import create_user_settings
+from crypto.hash_sha256 import hash_password
 
 
 # CREATE - Register User
 def register_user(username: str, password: str, email: str) -> bool:
-    password_hash = password  # akan diganti dengan hash
+    password_hash = hash_password(password)
 
     try:
         with get_connection() as conn:
@@ -26,7 +28,11 @@ def register_user(username: str, password: str, email: str) -> bool:
                 (username, password_hash, email),
             )
             conn.commit()
-            return True
+
+            user_id = cursor.lastrowid
+
+        create_user_settings(user_id)
+        return True
     except sqlite3.Error as e:
         print("Database Error (register_user):", e)
         return False
@@ -34,7 +40,7 @@ def register_user(username: str, password: str, email: str) -> bool:
 
 # READ - Login User
 def login_user(username: str, password: str) -> dict | None:
-    password_hash = password  # akan diganti dengan hash
+    password_hash = hash_password(password)
 
     try:
         with get_connection() as conn:
