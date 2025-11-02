@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from datetime import datetime
 from database.db_connection import get_connection
@@ -11,12 +12,13 @@ def add_note(title: str, encrypted_content: str, user_id: int) -> bool:
         with get_connection() as conn:
             cursor = conn.cursor()
             created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            encrypted_content_json = json.dumps(encrypted_content)
             cursor.execute(
                 """
                 INSERT INTO notes (title, encrypted_content, created_at, user_id)
                 VALUES (?, ?, ?, ?)
                 """,
-                (title, str(encrypted_content), created_at, user_id),
+                (title, encrypted_content_json, created_at, user_id),
             )
             conn.commit()
             return True
@@ -56,7 +58,7 @@ def get_all_notes(user_id: int) -> list:
 
 
 # READ - Ambil Catatan Berdasarkan ID
-def get_note_by_id(note_id: int, user_id: int, key: str) -> dict | None:
+def get_note_by_id(note_id: int, user_id: int) -> dict | None:
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -70,12 +72,11 @@ def get_note_by_id(note_id: int, user_id: int, key: str) -> dict | None:
             )
             row = cursor.fetchone()
             if row:
-                decrypted_content = super_decrypt(row[2], key)
 
                 return {
                     "id": row[0],
                     "title": row[1],
-                    "content": decrypted_content,
+                    "content": json.loads(row[2]),
                     "created_at": row[3],
                 }
             return None
@@ -85,18 +86,18 @@ def get_note_by_id(note_id: int, user_id: int, key: str) -> dict | None:
 
 
 # UPDATE - Perbarui Catatan
-def update_note(note_id: int, title: str, content: str, user_id: int, key: str) -> bool:
-    encrypted_content = super_encrypt(content, key)
+def update_note(note_id: int, title: str, encrypted_content, user_id: int) -> bool:
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
+            encrypted_content_json = json.dumps(encrypted_content)
             cursor.execute(
                 """
                 UPDATE notes
                 SET title = ?, encrypted_content = ?
                 WHERE id = ? AND user_id = ?
                 """,
-                (title, encrypted_content, note_id, user_id),
+                (title, encrypted_content_json, note_id, user_id),
             )
             conn.commit()
             return cursor.rowcount > 0
