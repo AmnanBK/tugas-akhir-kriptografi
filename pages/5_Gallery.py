@@ -153,7 +153,7 @@ def main():
             with col3:
                 if st.button("🗑️ Hapus", key=f"del_{img['id']}"):
                     delete_stego_image(img["id"], user_id)
-                    st.experimental_rerun()
+                    st.rerun()
 
 
 if __name__ == "__main__":
