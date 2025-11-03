@@ -1,37 +1,9 @@
 import streamlit as st
-from database.notes import get_all_notes, get_note_by_id, delete_note
-from utils.encryption_utils import super_decrypt
+from database.notes import get_all_notes, delete_note
+from utils.auth_utils import check_login
+from utils.ui_components import show_sidebar
 
 st.set_page_config(page_title="Dashboard", layout="wide")
-
-
-def logout():
-    st.session_state.clear()
-    st.session_state["page"] = "login"
-    st.rerun()
-
-
-def show_sidebar():
-    username = st.session_state.get("username", "UserDemo")
-    with st.sidebar:
-        st.markdown("## 🔐 Secret Diary")
-        st.write(f"👤 **{username}**")
-        st.divider()
-
-        if st.button("🏠 Dashboard", use_container_width=True):
-            st.rerun()
-        if st.button("📝 Tambah Catatan", use_container_width=True):
-            st.switch_page("pages/2_Add_Note.py")
-        if st.button("🔒 Brankas Pribadi", use_container_width=True):
-            st.switch_page("pages/4_File_Vault.py")
-        if st.button("🖼️ Galeri Rahasia", use_container_width=True):
-            st.switch_page("pages/5_Gallery.py")
-        if st.button("⚙️ Pengaturan", use_container_width=True):
-            st.switch_page("pages/6_Settings.py")
-
-        st.divider()
-        if st.button("🚪 Logout", use_container_width=True):
-            logout()
 
 
 def show_dashboard():
@@ -88,17 +60,7 @@ def show_dashboard():
 
 
 def main():
-    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
-        st.warning("Silakan login terlebih dahulu!")
-        st.switch_page("app.py")
-        return
-
-    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
-    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
-    rsa_private = st.session_state["user_settings"]["rsa_private"]
-    rsa_public = st.session_state["user_settings"]["rsa_public"]
-    vault_key = st.session_state["user_settings"]["vault_key"]
-
+    check_login()
     show_sidebar()
     show_dashboard()
 
