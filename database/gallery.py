@@ -22,7 +22,7 @@ def add_stego_image(title: str, image_data: bytes, user_id: int) -> bool:
             created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             cursor.execute(
                 """
-                INSERT INTO gallery (title, stego_image, user_id, created_at)
+                INSERT INTO gallery (title, stego_path, user_id, created_at)
                 VALUES (?, ?, ?, ?)
                 """,
                 (title, file_path, user_id, created_at),
@@ -42,7 +42,7 @@ def get_all_stego_images(user_id: int) -> list:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, title, stego_image, created_at
+                SELECT id, title, stego_path, created_at
                 FROM gallery
                 WHERE user_id = ?
                 ORDER BY created_at DESC
@@ -66,7 +66,7 @@ def get_stego_image_by_id(image_id: int, user_id: int) -> dict | None:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, title, stego_image, created_at
+                SELECT id, title, stego_path, created_at
                 FROM gallery
                 WHERE id = ? AND user_id = ?
                 """,
