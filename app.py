@@ -1,17 +1,20 @@
+import os
 import streamlit as st
+from utils.validators import validate_email, validate_password, validate_username
+from utils.form_utils import reset_login_form, reset_register_form
+from dotenv import load_dotenv
 from database.users import login_user, register_user
 from database.settings import get_user_settings
-from crypto.aes128 import encrypt_aes, decrypt_aes
+from crypto.aes128 import encrypt_aes
+
+load_dotenv()
 
 st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="centered")
 
 
 def logout():
-    st.session_state["logged_in"] = False
-    st.session_state["page"] = "login"
-    for key in ["username", "user_id"]:
-        if key in st.session_state:
-            del st.session_state[key]
+    for key in ["logged_in", "page", "username", "user_id", "user_settings"]:
+        st.session_state.pop(key, None)
     st.rerun()
 
 
@@ -30,6 +33,7 @@ def show_login():
             with st.spinner("Memeriksa akun..."):
                 user = login_user(username, password)
             if user:
+                reset_login_form()
                 st.success("Login berhasil! Mengarahkan ke dashboard...")
                 st.session_state["logged_in"] = True
                 st.session_state["username"] = user["username"]
@@ -56,22 +60,33 @@ def show_register():
     st.title("📝 Daftar Akun Baru")
     st.subheader("Buat akun untuk menyimpan catatan dan file terenkripsi")
 
-    email = st.text_input("E-mail Baru")
-    username = st.text_input("Username Baru")
+    username = st.text_input("Username")
+    email = st.text_input("E-mail")
     password = st.text_input("Password", type="password")
-    master_key = b"16byteslongkey!!"
-    email_enc = encrypt_aes(email, master_key)
+    master_key_str = os.getenv("MASTER_KEY")
+    master_key = master_key_str.encode("utf-8")
 
     if st.button("Daftar"):
         if username.strip() == "" or password.strip() == "" or email.strip() == "":
             st.error("Semua field wajib diisi!")
+            return
+        if not validate_username(username):
+            st.error("Username hanya boleh menggunakan huruf dan angka")
+            return
+        if not validate_email(email):
+            st.error("Format email tidak valid!")
+            return
+        if not validate_password(password):
+            st.error("Password terlalu lemah! Panjang minimal 8 karakter")
+            return
         else:
             with st.spinner("Membuat akun..."):
+                email_enc = encrypt_aes(email, master_key)
                 success = register_user(username, password, email_enc)
             if success:
                 st.success("Akun berhasil dibuat! Silakan login.")
+                reset_register_form()
                 st.session_state["page"] = "login"
-                # st.rerun()
             else:
                 st.error("Username atau email sudah digunakan!")
 
@@ -96,7 +111,6 @@ def main():
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
 
-    # init_session()
     page = st.session_state.get("page", "login")
 
     if st.session_state.get("logged_in", False):
