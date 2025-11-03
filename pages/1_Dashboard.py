@@ -3,11 +3,6 @@ from database.notes import get_all_notes, get_note_by_id, delete_note
 from utils.encryption_utils import super_decrypt
 
 st.set_page_config(page_title="Dashboard", layout="wide")
-caesar_key = int(st.session_state["user_settings"]["caesar_key"])
-vigenere_key = st.session_state["user_settings"]["vigenere_key"]
-rsa_private = st.session_state["user_settings"]["rsa_private"]
-rsa_public = st.session_state["user_settings"]["rsa_public"]
-vault_key = st.session_state["user_settings"]["vault_key"]
 
 
 def logout():
@@ -95,12 +90,18 @@ def show_dashboard():
 def main():
     if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
         st.warning("Silakan login terlebih dahulu!")
-        st.switch_page("app")
+        st.switch_page("app.py")
         return
+
+    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
+    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+    rsa_private = st.session_state["user_settings"]["rsa_private"]
+    rsa_public = st.session_state["user_settings"]["rsa_public"]
+    vault_key = st.session_state["user_settings"]["vault_key"]
 
     show_sidebar()
     show_dashboard()
 
 
 if __name__ == "__main__":
-    main()    
+    main()
