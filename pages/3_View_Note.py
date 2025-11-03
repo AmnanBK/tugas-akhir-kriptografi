@@ -1,47 +1,24 @@
 import json
 import streamlit as st
 from utils.encryption_utils import super_decrypt
+from utils.auth_utils import check_login
+from utils.ui_components import show_sidebar
 
 st.set_page_config(page_title="Detail Catatan", layout="wide")
 
 
-def main():
-    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
-        st.warning("Silakan login terlebih dahulu!")
-        st.switch_page("app.py")
-        return
-
-    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
-    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+def show_view_note():
     rsa_private = st.session_state["user_settings"]["rsa_private"]
-    encrypted_content = json.loads(st.session_state["view_note"]["encrypted_content"])
-
-    username = st.session_state.get("username", "UserDemo")
-    user_settings = st.session_state.get("user_settings", {})
-
-    with st.sidebar:
-        st.markdown("## 🔐 Secret Diary")
-        st.write(f"👤 **{username}**")
-        st.divider()
-        if st.button("🏠 Dashboard", use_container_width=True):
-            st.switch_page("pages/1_Dashboard.py")
-        if st.button("📝 Tambah Catatan", use_container_width=True):
-            st.switch_page("pages/2_Add_Note.py")
-        if st.button("🔒 Brankas Pribadi", use_container_width=True):
-            st.switch_page("pages/4_File_Vault.py")
-        if st.button("🖼️ Galeri Rahasia", use_container_width=True):
-            st.switch_page("pages/5_Gallery.py")
-        if st.button("⚙️ Pengaturan", use_container_width=True):
-            st.switch_page("pages/6_Settings.py")
-        st.divider()
-        if st.button("🚪 Logout", use_container_width=True):
-            st.session_state.clear()
-            st.switch_page("app")
+    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
 
     note = st.session_state.get("view_note")
+
     if not note:
         st.warning("⚠️ Tidak ada catatan yang dipilih!")
         st.stop()
+
+    encrypted_content = json.loads(note["encrypted_content"])
 
     st.title("📝 Detail Catatan")
     st.subheader(note["title"])
@@ -64,6 +41,12 @@ def main():
             st.text_area("Plaintext", decrypted_text, height=200)
         except Exception as e:
             st.error(f"❌ Gagal dekripsi: {e}")
+
+
+def main():
+    check_login()
+    show_sidebar()
+    show_view_note()
 
 
 if __name__ == "__main__":
