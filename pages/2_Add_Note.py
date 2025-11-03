@@ -1,38 +1,11 @@
 import streamlit as st
 from database.notes import add_note, update_note, get_note_by_id
 from utils.encryption_utils import super_encrypt, super_decrypt
+from utils.auth_utils import check_login
+from utils.ui_components import show_sidebar
 from datetime import datetime
 
 st.set_page_config(page_title="Tambah Catatan", layout="wide")
-
-
-def logout():
-    st.session_state.clear()
-    st.session_state["page"] = "login"
-    st.rerun()
-
-
-def show_sidebar():
-    username = st.session_state.get("username", "UserDemo")
-    with st.sidebar:
-        st.markdown("## 🔐 Secret Diary")
-        st.write(f"👤 **{username}**")
-        st.divider()
-
-        if st.button("🏠 Dashboard", use_container_width=True):
-            st.switch_page("pages/1_Dashboard.py")
-        if st.button("📝 Tambah Catatan", use_container_width=True):
-            st.rerun()
-        if st.button("🔒 Brankas Pribadi", use_container_width=True):
-            st.switch_page("pages/4_File_Vault.py")
-        if st.button("🖼️ Galeri Rahasia", use_container_width=True):
-            st.switch_page("pages/5_Gallery.py")
-        if st.button("⚙️ Pengaturan", use_container_width=True):
-            st.switch_page("pages/6_Settings.py")
-
-        st.divider()
-        if st.button("🚪 Logout", use_container_width=True):
-            logout()
 
 
 def show_add_edit_form():
@@ -41,9 +14,14 @@ def show_add_edit_form():
 
     edit_note_id = st.session_state.get("edit_note_id")
     user_id = st.session_state.get("user_id")
+    rsa_private = st.session_state["user_settings"]["rsa_private"]
+    rsa_public = st.session_state["user_settings"]["rsa_public"]
+    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
 
     default_judul = ""
     default_isi = ""
+
     if edit_note_id:
         note_data = get_note_by_id(edit_note_id, user_id)
         if note_data:
@@ -70,7 +48,6 @@ def show_add_edit_form():
             return
 
         try:
-            # Super encryption
             encrypted_content = super_encrypt(
                 isi_input, caesar_key, vigenere_key, rsa_public
             )
@@ -102,16 +79,7 @@ def show_add_edit_form():
 
 
 def main():
-    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
-        st.warning("Silakan login terlebih dahulu!")
-        st.switch_page("app.py")
-        return
-
-    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
-    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
-    rsa_private = st.session_state["user_settings"]["rsa_private"]
-    rsa_public = st.session_state["user_settings"]["rsa_public"]
-    vault_key = st.session_state["user_settings"]["vault_key"]
+    check_login()
     show_sidebar()
     show_add_edit_form()
 
