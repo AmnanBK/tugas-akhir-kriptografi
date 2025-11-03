@@ -20,7 +20,7 @@ def add_file(file_name: str, file_data: bytes, user_id: int) -> bool:
             created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             cursor.execute(
                 """
-                INSERT INTO vault (file_name, file_data, user_id, created_at)
+                INSERT INTO vault (file_name, file_path, user_id, created_at)
                 VALUES (?, ?, ?, ?)
                 """,
                 (file_name, file_path, user_id, created_at),
@@ -40,7 +40,7 @@ def get_all_files(user_id: int) -> list:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, file_name, file_data, created_at
+                SELECT id, file_name, file_path, created_at
                 FROM vault
                 WHERE user_id = ?
                 ORDER BY created_at DESC
@@ -65,7 +65,7 @@ def get_file_by_id(file_id: int, user_id: int) -> dict | None:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, file_name, file_data, created_at
+                SELECT id, file_name, file_path, created_at
                 FROM vault
                 WHERE id = ? AND user_id = ?
                 """,
