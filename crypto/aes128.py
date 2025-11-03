@@ -48,10 +48,10 @@ def decrypt_cbc(ciphertext: bytes, key: bytes) -> bytes:
         prev = block
     return unpad(plaintext)
 
-def encrypt_text(value_text: str, key: bytes) -> str:
+def encrypt_aes(value_text: str, key: bytes) -> str:
     enc_bytes = encrypt_cbc(value_text.encode("utf-8"), key)
     return base64.b64encode(enc_bytes).decode("utf-8")
 
-def decrypt_text(enc_b64: str, key: bytes) -> str:
+def decrypt_aes(enc_b64: str, key: bytes) -> str:
     enc_bytes = base64.b64decode(enc_b64.encode("utf-8"))
     return decrypt_cbc(enc_bytes, key).decode("utf-8")
