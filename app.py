@@ -1,6 +1,7 @@
 import streamlit as st
 from database.users import login_user, register_user
 from database.settings import get_user_settings
+from crypto.aes128 import encrypt_aes, decrypt_aes
 
 st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="centered")
 
@@ -64,11 +65,13 @@ def show_register():
             st.error("Semua field wajib diisi!")
         else:
             with st.spinner("Membuat akun..."):
-                success = register_user(username, password, email)
+                master_key = b"16byteslongkey!!"
+                email_enc = encrypt_aes(email, master_key)
+                success = register_user(username, password, email_enc)
             if success:
                 st.success("Akun berhasil dibuat! Silakan login.")
                 st.session_state["page"] = "login"
-                st.rerun()
+                # st.rerun()
             else:
                 st.error("Username atau email sudah digunakan!")
 
