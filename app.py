@@ -59,14 +59,14 @@ def show_register():
     email = st.text_input("E-mail Baru")
     username = st.text_input("Username Baru")
     password = st.text_input("Password", type="password")
+    master_key = b"16byteslongkey!!"
+    email_enc = encrypt_aes(email, master_key)
 
     if st.button("Daftar"):
         if username.strip() == "" or password.strip() == "" or email.strip() == "":
             st.error("Semua field wajib diisi!")
         else:
             with st.spinner("Membuat akun..."):
-                master_key = b"16byteslongkey!!"
-                email_enc = encrypt_aes(email, master_key)
                 success = register_user(username, password, email_enc)
             if success:
                 st.success("Akun berhasil dibuat! Silakan login.")
