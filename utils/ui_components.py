@@ -3,7 +3,6 @@ from utils.auth_utils import logout
 
 
 def show_sidebar():
-    """Tampilkan sidebar navigasi umum."""
     username = st.session_state.get("username", "UserDemo")
 
     with st.sidebar:
@@ -11,7 +10,6 @@ def show_sidebar():
         st.write(f"👤 **{username}**")
         st.divider()
 
-        # Navigasi utama
         if st.button("🏠 Dashboard", use_container_width=True):
             st.switch_page("app.py")
 
