@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from utils.validators import validate_email, validate_password, validate_username
-from utils.form_utils import reset_login_form, reset_register_form
+from utils.auth_utils import logout
 from dotenv import load_dotenv
 from database.users import login_user, register_user
 from database.settings import get_user_settings
@@ -12,16 +12,9 @@ load_dotenv()
 st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="centered")
 
 
-def logout():
-    for key in ["logged_in", "page", "username", "user_id", "user_settings"]:
-        st.session_state.pop(key, None)
-    st.rerun()
-
-
-# Fungsi halaman
 def show_login():
     st.title("🔐 Secret Diary App")
-    st.subheader("Masuk untuk membuka brankas rahasiamu 🔑")
+    st.subheader("Masuk untuk mengakses brankasmu 🔑")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
@@ -33,7 +26,6 @@ def show_login():
             with st.spinner("Memeriksa akun..."):
                 user = login_user(username, password)
             if user:
-                reset_login_form()
                 st.success("Login berhasil! Mengarahkan ke dashboard...")
                 st.session_state["logged_in"] = True
                 st.session_state["username"] = user["username"]
@@ -77,7 +69,7 @@ def show_register():
             st.error("Format email tidak valid!")
             return
         if not validate_password(password):
-            st.error("Password terlalu lemah! Panjang minimal 8 karakter")
+            st.error("Panjang password minimal 8 karakter")
             return
         else:
             with st.spinner("Membuat akun..."):
@@ -85,7 +77,6 @@ def show_register():
                 success = register_user(username, password, email_enc)
             if success:
                 st.success("Akun berhasil dibuat! Silakan login.")
-                reset_register_form()
                 st.session_state["page"] = "login"
             else:
                 st.error("Username atau email sudah digunakan!")
@@ -97,14 +88,6 @@ def show_register():
         st.rerun()
 
 
-def show_dashboard():
-    st.title(f"Selamat datang, {st.session_state['username']} 👋")
-    st.success("Kamu berhasil login.")
-    if st.button("Logout"):
-        logout()
-
-
-# Main
 def main():
     if "page" not in st.session_state:
         st.session_state["page"] = "login"
