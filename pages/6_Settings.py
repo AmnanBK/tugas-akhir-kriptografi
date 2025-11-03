@@ -6,13 +6,15 @@ import os
 FILE_DIR = "data/files"
 os.makedirs(FILE_DIR, exist_ok=True)
 
-# RC4 Dummy
-def rc4_encrypt_decrypt(key, data):
-    # untuk contoh, kita return data apa adanya
-    return data
+st.set_page_config(page_title="Pengaturan", layout="wide")
+
 
 def main():
-    st.set_page_config(page_title="Pengaturan", layout="wide")
+
+    if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
+        st.warning("Silakan login terlebih dahulu!")
+        st.switch_page("app.py")
+        return
 
     # Simulasi login sementara
     username = st.session_state.get("username", "UserDemo")
@@ -81,10 +83,11 @@ def main():
     st.warning("⚠️ Akun akan dihapus secara permanen")
     if st.button("Hapus Akun", type="secondary"):
         st.write("Apakah kamu yakin ingin menghapus akun ini?")
-            # delete_user(username)
-            # st.success("Akun berhasil dihapus!")
-            # st.session_state.clear()
-            # st.experimental_rerun()  # atau arahkan ke halaman login
+        # delete_user(username)
+        # st.success("Akun berhasil dihapus!")
+        # st.session_state.clear()
+        # st.experimental_rerun()  # atau arahkan ke halaman login
+
 
 if __name__ == "__main__":
     main()

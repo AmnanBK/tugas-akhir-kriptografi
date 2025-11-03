@@ -4,11 +4,6 @@ from utils.encryption_utils import super_encrypt, super_decrypt
 from datetime import datetime
 
 st.set_page_config(page_title="Tambah Catatan", layout="wide")
-caesar_key = int(st.session_state["user_settings"]["caesar_key"])
-vigenere_key = st.session_state["user_settings"]["vigenere_key"]
-rsa_private = st.session_state["user_settings"]["rsa_private"]
-rsa_public = st.session_state["user_settings"]["rsa_public"]
-vault_key = st.session_state["user_settings"]["vault_key"]
 
 
 def logout():
@@ -109,9 +104,14 @@ def show_add_edit_form():
 def main():
     if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
         st.warning("Silakan login terlebih dahulu!")
-        st.switch_page("app")
+        st.switch_page("app.py")
         return
 
+    caesar_key = int(st.session_state["user_settings"]["caesar_key"])
+    vigenere_key = st.session_state["user_settings"]["vigenere_key"]
+    rsa_private = st.session_state["user_settings"]["rsa_private"]
+    rsa_public = st.session_state["user_settings"]["rsa_public"]
+    vault_key = st.session_state["user_settings"]["vault_key"]
     show_sidebar()
     show_add_edit_form()
 
