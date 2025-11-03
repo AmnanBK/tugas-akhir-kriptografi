@@ -87,3 +87,30 @@ def delete_user(user_id: int) -> bool:
     except sqlite3.Error as e:
         print("Database Error (delete_user):", e)
         return False
+
+def get_password_by_id(user_id: int) -> str | None:
+    try:
+        print(user_id)
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT password_hash FROM users WHERE id = ?", (user_id,))
+            row = cursor.fetchone()
+            return row[0] if row else None
+    except sqlite3.Error as e:
+        print("Database Error (get_password_by_id):", e)
+        return None
+
+#  UPDATE - Update password
+def update_user_password(user_id: int, new_password_hash: str) -> bool:
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET password_hash = ? WHERE id = ?",
+                (new_password_hash, user_id),
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print("Database Error (update_user_password):", e)
+        return False
