@@ -4,12 +4,8 @@ from crypto.rsa import generate_keys
 from database.db_connection import get_connection
 
 
-DEFAULT_CAESAR_KEY = 3
-DEFAULT_VIGENERE_KEY = "SECRET"
-
-
 # CREATE - Tambah / Inisialisasi Pengaturan Default untuk User Baru
-def create_user_settings(user_id: int) -> bool:
+def create_user_settings(user_id: int, caesar_key: str, vigenere_key: str) -> bool:
     rsa_public, rsa_private = generate_keys()
     rsa_public_str = json.dumps(rsa_public)
     rsa_private_str = json.dumps(rsa_private)
@@ -21,12 +17,12 @@ def create_user_settings(user_id: int) -> bool:
                 """
                 INSERT OR IGNORE INTO settings
                 (user_id, caesar_key, vigenere_key, rsa_private, rsa_public)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
                 """,
                 (
                     user_id,
-                    DEFAULT_CAESAR_KEY,
-                    DEFAULT_VIGENERE_KEY,
+                    caesar_key,
+                    vigenere_key,
                     rsa_private_str,
                     rsa_public_str,
                 ),
