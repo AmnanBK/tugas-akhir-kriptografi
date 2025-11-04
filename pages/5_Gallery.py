@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from PIL import Image
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar, hide_default_sidebar()
+from utils.ui_components import show_sidebar, hide_default_sidebar
 from crypto.lsb_stego import encode_text_into_image, decode_text_from_image
 from database.gallery import (
     add_stego_image,
@@ -52,7 +52,9 @@ def encode_and_save_stego(title, temp_input, secret_msg, user_id):
 
 def show_encode_success(output_path, output_name, image_data):
     st.success("✅ Pesan berhasil disembunyikan dan disimpan!")
-    st.image(output_path, caption="Gambar dengan pesan tersembunyi", use_container_width=True)
+    st.image(
+        output_path, caption="Gambar dengan pesan tersembunyi", use_container_width=True
+    )
     st.download_button(
         label="⬇️ Unduh Gambar Stego",
         data=image_data,
