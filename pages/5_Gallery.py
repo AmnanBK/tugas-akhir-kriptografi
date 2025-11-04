@@ -102,7 +102,7 @@ def show_gallery_list(user_id):
                     data=f,
                     file_name=os.path.basename(img["file_path"]),
                     mime="image/png",
-                    key=f"dl_{img['id']}",  # key unik
+                    key=f"dl_{img['id']}", 
                 )
         with col4:
             if st.button("🗑️ Hapus", key=f"del_{img['id']}"):
