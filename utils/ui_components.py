@@ -17,7 +17,7 @@ def show_sidebar():
     username = st.session_state.get("username", "UserDemo")
 
     with st.sidebar:
-        st.markdown("## 🔐 Secret Diary")
+        st.markdown("## 🔐 Private Vault")
         st.write(f"👤 **{username}**")
         st.divider()
 

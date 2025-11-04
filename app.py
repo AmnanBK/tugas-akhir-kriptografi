@@ -16,11 +16,11 @@ from crypto.aes128 import encrypt_aes
 
 load_dotenv()
 
-st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="centered")
+st.set_page_config(page_title="Private Vault App", page_icon="🔐", layout="centered")
 
 
 def show_login():
-    st.title("🔐 Secret Vault App")
+    st.title("🔐 Private Vault App")
     st.subheader("Masuk untuk mengakses brankasmu 🔑")
 
     username = st.text_input("Username")
