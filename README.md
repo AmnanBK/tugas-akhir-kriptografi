@@ -1,5 +1,9 @@
 # tugas-akhir-kriptografi - Private Vault App
 
+Kelas IF- A Kelompok 6:
+- Cindy Nabella Susanto / 123230058
+- Amnan Budi Kusuma / 123230078
+
 Private Vault App adalah aplikais berbasis **Streamlit** yang berfungsi untuk menyimpan file dan data pribadi dengan aman menggunakan implementasi berbagai **algoritma kriptografi klasik dan modern**, seperti RC4, Caesar Cipher, Vigenère Cipher, dan RSA.
 
 ---
