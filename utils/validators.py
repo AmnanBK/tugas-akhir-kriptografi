@@ -6,7 +6,7 @@ def validate_email(email: str) -> bool:
 
 
 def validate_password(password: str) -> bool:
-    return len(password) >= 8
+    return len(password) >= 8 and all(32 <= ord(c) <= 126 for c in password)
 
 
 def validate_username(username: str) -> bool:

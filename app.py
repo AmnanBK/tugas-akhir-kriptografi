@@ -84,7 +84,9 @@ def show_register():
             st.warning("⚠️ Format email tidak valid!")
             valid = False
         elif not validate_password(password):
-            st.warning("⚠️ Panjang password minimal 8 karakter.")
+            st.warning(
+                "⚠️ Panjang password minimal 8 karakter dan tidak mengandung karakter spesial"
+            )
             valid = False
         elif not validate_caesar_key(caesar_key):
             st.warning("⚠️ Caesaer Key harus berupa angka antara 0 - 25")
