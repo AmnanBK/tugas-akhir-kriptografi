@@ -5,7 +5,9 @@ from crypto.hash_sha256 import hash_password
 
 
 # CREATE - Register User
-def register_user(username: str, password: str, email: str) -> bool:
+def register_user(
+    username: str, password: str, email: str, caesar_key: str, vigenere_key: str
+) -> bool:
     password_hash = hash_password(password)
 
     try:
@@ -31,7 +33,7 @@ def register_user(username: str, password: str, email: str) -> bool:
 
             user_id = cursor.lastrowid
 
-        create_user_settings(user_id)
+        create_user_settings(user_id, caesar_key, vigenere_key)
         return True
     except sqlite3.Error as e:
         print("Database Error (register_user):", e)

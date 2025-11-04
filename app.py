@@ -55,6 +55,8 @@ def show_register():
     username = st.text_input("Username")
     email = st.text_input("E-mail")
     password = st.text_input("Password", type="password")
+    caesar_key = st.text_input("Masukkan Caesar Key", type="password")
+    vigenere_key = st.text_input("Masukkan Vigenere Key", type="password")
     master_key_str = os.getenv("MASTER_KEY")
     master_key = master_key_str.encode("utf-8")
 
@@ -74,22 +76,14 @@ def show_register():
         else:
             with st.spinner("Membuat akun..."):
                 email_enc = encrypt_aes(email, master_key)
-                success = register_user(username, password, email_enc)
+                success = register_user(
+                    username, password, email_enc, caesar_key, vigenere_key
+                )
             if success:
-                user = login_user(username, password)
+                st.success("Akun berhasil dibuat! Silakan login.")
                 st.session_state["page"] = "login"
-                st.session_state["logged_in"] = True
-                st.session_state["username"] = user["username"]
-                st.session_state["user_id"] = user["id"]
-
-                settings = get_user_settings(user["id"])
-                if settings:
-                    st.session_state["user_settings"] = settings
-                else:
-                    st.session_state["user_settings"] = {}
             else:
                 st.error("Username atau email sudah digunakan!")
-            st.switch_page("pages/7_Setup.py")
 
     st.markdown("---")
     st.caption("Sudah punya akun?")
