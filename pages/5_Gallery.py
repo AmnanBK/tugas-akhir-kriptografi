@@ -89,13 +89,22 @@ def show_gallery_list(user_id):
         return
 
     for img in images:
-        col1, col2, col3 = st.columns([4, 2, 1])
+        col1, col2, col3, col4 = st.columns([4, 2, 1, 1])
         with col1:
             st.markdown(f"**{img['title']}**")
             st.caption(f"📅 {img['created_at']}")
         with col2:
             st.image(img["file_path"], width=150)
         with col3:
+            with open(img["file_path"], "rb") as f:
+                st.download_button(
+                    label="⬇️ Unduh",
+                    data=f,
+                    file_name=os.path.basename(img["file_path"]),
+                    mime="image/png",
+                    key=f"dl_{img['id']}", 
+                )
+        with col4:
             if st.button("🗑️ Hapus", key=f"del_{img['id']}"):
                 delete_stego_image(img["id"], user_id)
                 st.rerun()
