@@ -78,7 +78,6 @@ def show_file_vault():
                 st.success(
                     f"✅ File '{uploaded_file.name}' berhasil dienkripsi dan disimpan!"
                 )
-                st.rerun()
             else:
                 st.error("❌ Gagal menyimpan file ke database.")
 
