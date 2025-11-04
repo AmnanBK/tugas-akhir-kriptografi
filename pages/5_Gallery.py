@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from PIL import Image
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar
+from utils.ui_components import show_sidebar, hide_default_sidebar()
 from crypto.lsb_stego import encode_text_into_image, decode_text_from_image
 from database.gallery import (
     add_stego_image,
@@ -137,6 +137,7 @@ def show_gallery():
 
 def main():
     check_login()
+    hide_default_sidebar()
     show_sidebar()
     show_gallery()
 

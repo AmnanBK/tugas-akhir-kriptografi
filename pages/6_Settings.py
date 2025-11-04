@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-from database.settings import update_user_settings
 from database.users import (
     update_user_password,
     get_password_by_id,
@@ -9,7 +8,7 @@ from database.users import (
 from crypto.hash_sha256 import hash_password
 from database.settings import get_user_settings
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar
+from utils.ui_components import show_sidebar, hide_default_sidebar
 
 
 FILE_DIR = "data/files"
@@ -115,6 +114,7 @@ def show_setting():
 
 def main():
     check_login()
+    hide_default_sidebar()
     show_sidebar()
     show_setting()
 

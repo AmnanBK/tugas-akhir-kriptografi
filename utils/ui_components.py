@@ -2,6 +2,17 @@ import streamlit as st
 from utils.auth_utils import logout
 
 
+def hide_default_sidebar():
+    hide_nav_style = """
+        <style>
+            [data-testid="stSidebarNav"] {
+                display: none;
+            }
+        </style>
+    """
+    st.markdown(hide_nav_style, unsafe_allow_html=True)
+
+
 def show_sidebar():
     username = st.session_state.get("username", "UserDemo")
 
