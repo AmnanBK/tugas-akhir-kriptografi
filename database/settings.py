@@ -1,7 +1,14 @@
 import json
 import sqlite3
+import os
+from dotenv import load_dotenv
+from crypto import rsa
 from crypto.rsa import generate_keys
+from crypto.aes128 import encrypt_aes, decrypt_aes
 from database.db_connection import get_connection
+
+load_dotenv()
+MASTER_KEY = os.getenv("MASTER_KEY").encode("utf-8")
 
 
 # CREATE - Tambah / Inisialisasi Pengaturan Default untuk User Baru
@@ -11,6 +18,12 @@ def create_user_settings(user_id: int, caesar_key: str, vigenere_key: str) -> bo
     rsa_private_str = json.dumps(rsa_private)
 
     try:
+
+        caesar_enc = encrypt_aes(caesar_key, MASTER_KEY)
+        vigenere_enc = encrypt_aes(vigenere_key, MASTER_KEY)
+        rsa_private_enc = encrypt_aes(rsa_private_str, MASTER_KEY)
+        rsa_public_enc = encrypt_aes(rsa_public_str, MASTER_KEY)
+
         with get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -21,10 +34,10 @@ def create_user_settings(user_id: int, caesar_key: str, vigenere_key: str) -> bo
                 """,
                 (
                     user_id,
-                    caesar_key,
-                    vigenere_key,
-                    rsa_private_str,
-                    rsa_public_str,
+                    caesar_enc,
+                    vigenere_enc,
+                    rsa_private_enc,
+                    rsa_public_enc,
                 ),
             )
             conn.commit()
@@ -50,8 +63,13 @@ def get_user_settings(user_id: int) -> dict | None:
             row = cursor.fetchone()
             if row:
                 try:
-                    rsa_private = json.loads(row[3]) if row[3] else None
-                    rsa_public = json.loads(row[4]) if row[4] else None
+                    caesar_key = decrypt_aes(row[1], MASTER_KEY) if row[1] else None
+                    vigenere_key = decrypt_aes(row[2], MASTER_KEY) if row[2] else None
+                    rsa_private = decrypt_aes(row[3], MASTER_KEY) if row[3] else None
+                    rsa_public = decrypt_aes(row[4], MASTER_KEY) if row[4] else None
+
+                    rsa_private = json.loads(rsa_private) if rsa_private else None
+                    rsa_public = json.loads(rsa_public) if rsa_public else None
 
                     if isinstance(rsa_private, list):
                         rsa_private = tuple(rsa_private)
@@ -64,8 +82,8 @@ def get_user_settings(user_id: int) -> dict | None:
 
                 return {
                     "id": row[0],
-                    "caesar_key": row[1],
-                    "vigenere_key": row[2],
+                    "caesar_key": caesar_key,
+                    "vigenere_key": vigenere_key,
                     "rsa_private": rsa_private,
                     "rsa_public": rsa_public,
                 }
