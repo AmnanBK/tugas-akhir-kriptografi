@@ -59,16 +59,16 @@ def decode_text_from_image(image_path: str) -> str | None:
             binary_text += str(g & 1)
             binary_text += str(b & 1)
 
-        all_bytes = [binary_text[i : i + 8] for i in range(0, len(binary_text), 8)]
-        decoded_text = ""
-        for byte in all_bytes:
-            if byte == "11111111":
-                if decoded_text.endswith(chr(255)):
-                    break
-            decoded_text += chr(int(byte, 2))
+        end_marker = "1111111111111110"
+        end_index = binary_text.find(end_marker)
 
-        decoded_text = decoded_text.replace(chr(255), "")
-        return decoded_text
+        if end_index != -1:
+            binary_text = binary_text[:end_index]
+
+        all_bytes = [binary_text[i:i+8] for i in range(0, len(binary_text), 8)]
+        decoded_text = "".join(chr(int(b, 2)) for b in all_bytes if len(b) == 8)
+
+        return decoded_text.strip() if decoded_text else None
     except Exception as e:
         print("LSB Decode Error:", e)
         return None
