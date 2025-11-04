@@ -1,6 +1,13 @@
 import os
+import time
 import streamlit as st
-from utils.validators import validate_email, validate_password, validate_username
+from utils.validators import (
+    validate_email,
+    validate_password,
+    validate_username,
+    validate_caesar_key,
+    validate_vigenere_key,
+)
 from utils.ui_components import hide_default_sidebar
 from dotenv import load_dotenv
 from database.users import login_user, register_user
@@ -13,7 +20,7 @@ st.set_page_config(page_title="Secret Diary App", page_icon="🔐", layout="cent
 
 
 def show_login():
-    st.title("🔐 Secret Diary App")
+    st.title("🔐 Secret Vault App")
     st.subheader("Masuk untuk mengakses brankasmu 🔑")
 
     username = st.text_input("Username")
@@ -50,40 +57,66 @@ def show_login():
 
 def show_register():
     st.title("📝 Daftar Akun Baru")
-    st.subheader("Buat akun untuk menyimpan catatan dan file terenkripsi")
+    st.caption("Buat akun untuk menyimpan catatan dan file terenkripsi dengan aman.")
+    st.divider()
 
-    username = st.text_input("Username")
-    email = st.text_input("E-mail")
-    password = st.text_input("Password", type="password")
-    caesar_key = st.text_input("Masukkan Caesar Key", type="password")
-    vigenere_key = st.text_input("Masukkan Vigenere Key", type="password")
+    username = st.text_input("👤 Username", key="username_input")
+    email = st.text_input("📧 E-mail", key="email_input")
+    password = st.text_input("🔒 Password", type="password", key="password_input")
+    caesar_key = st.text_input("🔑 Caesar Key", type="password", key="caesar_key_input")
+    vigenere_key = st.text_input(
+        "🔑 Vigenere Key", type="password", key="vigenere_key_input"
+    )
+
     master_key_str = os.getenv("MASTER_KEY")
-    master_key = master_key_str.encode("utf-8")
+    master_key = master_key_str.encode("utf-8") if master_key_str else None
 
-    if st.button("Daftar"):
-        if username.strip() == "" or password.strip() == "" or email.strip() == "":
-            st.error("Semua field wajib diisi!")
-            return
-        if not validate_username(username):
-            st.error("Username hanya boleh menggunakan huruf dan angka")
-            return
-        if not validate_email(email):
-            st.error("Format email tidak valid!")
-            return
-        if not validate_password(password):
-            st.error("Panjang password minimal 8 karakter")
-            return
-        else:
-            with st.spinner("Membuat akun..."):
+    valid = True
+
+    if st.button("🚀 Daftar"):
+        if not all([username.strip(), email.strip(), password.strip()]):
+            st.warning("⚠️ Semua field wajib diisi!")
+            valid = False
+        elif not validate_username(username):
+            st.warning("⚠️ Username hanya boleh menggunakan huruf dan angka.")
+            valid = False
+        elif not validate_email(email):
+            st.warning("⚠️ Format email tidak valid!")
+            valid = False
+        elif not validate_password(password):
+            st.warning("⚠️ Panjang password minimal 8 karakter.")
+            valid = False
+        elif not validate_caesar_key(caesar_key):
+            st.warning("⚠️ Caesaer Key harus berupa angka antara 0 - 25")
+            valid = False
+        elif not validate_vigenere_key(vigenere_key):
+            st.warning("⚠️ Vigenere Key hanya boleh mengandung huruf")
+            valid = False
+        elif not master_key:
+            st.error("❌ MASTER_KEY tidak ditemukan di file .env")
+            valid = False
+
+        if valid:
+            try:
                 email_enc = encrypt_aes(email, master_key)
                 success = register_user(
                     username, password, email_enc, caesar_key, vigenere_key
                 )
-            if success:
-                st.success("Akun berhasil dibuat! Silakan login.")
-                st.session_state["page"] = "login"
-            else:
-                st.error("Username atau email sudah digunakan!")
+
+                if success:
+                    st.success("✅ Akun berhasil dibuat!")
+                    countdown_placeholder = st.empty()
+                    for i in range(3, 0, -1):
+                        countdown_placeholder.info(
+                            f"🔁 Mengarahkan ke halaman login dalam {i} detik..."
+                        )
+                        time.sleep(1)
+                    st.session_state["page"] = "login"
+                    st.rerun()
+                else:
+                    st.error("❌ Username atau email sudah digunakan.")
+            except Exception as e:
+                st.error(f"Terjadi kesalahan: {e}")
 
     st.markdown("---")
     st.caption("Sudah punya akun?")
