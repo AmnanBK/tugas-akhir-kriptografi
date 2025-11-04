@@ -2,7 +2,7 @@ import streamlit as st
 from database.notes import add_note, update_note, get_note_by_id
 from utils.encryption_utils import super_encrypt, super_decrypt
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar
+from utils.ui_components import show_sidebar, hide_default_sidebar
 from datetime import datetime
 
 st.set_page_config(page_title="Tambah Catatan", layout="wide")
@@ -80,6 +80,7 @@ def show_add_edit_form():
 
 def main():
     check_login()
+    hide_default_sidebar()
     show_sidebar()
     show_add_edit_form()
 

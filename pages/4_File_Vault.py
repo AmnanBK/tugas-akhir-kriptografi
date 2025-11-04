@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar
+from utils.ui_components import show_sidebar, hide_default_sidebar
 from crypto.rc4 import rc4_encrypt_decrypt
 from database.files import add_file, get_all_files, delete_file
 
@@ -95,6 +95,7 @@ def show_file_vault():
 
 def main():
     check_login()
+    hide_default_sidebar()
     show_sidebar()
     show_file_vault()
 

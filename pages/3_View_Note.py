@@ -2,7 +2,7 @@ import json
 import streamlit as st
 from utils.encryption_utils import super_decrypt
 from utils.auth_utils import check_login
-from utils.ui_components import show_sidebar
+from utils.ui_components import show_sidebar, hide_default_sidebar
 
 st.set_page_config(page_title="Detail Catatan", layout="wide")
 
@@ -45,6 +45,7 @@ def show_view_note():
 
 def main():
     check_login()
+    hide_default_sidebar()
     show_sidebar()
     show_view_note()
 

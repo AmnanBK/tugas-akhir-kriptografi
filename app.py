@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from utils.validators import validate_email, validate_password, validate_username
-from utils.auth_utils import logout
+from utils.ui_components import hide_default_sidebar
 from dotenv import load_dotenv
 from database.users import login_user, register_user
 from database.settings import get_user_settings
@@ -93,6 +93,7 @@ def show_register():
 
 
 def main():
+    hide_default_sidebar()
     if "page" not in st.session_state:
         st.session_state["page"] = "login"
     if "logged_in" not in st.session_state:
