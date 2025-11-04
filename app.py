@@ -76,10 +76,20 @@ def show_register():
                 email_enc = encrypt_aes(email, master_key)
                 success = register_user(username, password, email_enc)
             if success:
-                st.success("Akun berhasil dibuat! Silakan login.")
+                user = login_user(username, password)
                 st.session_state["page"] = "login"
+                st.session_state["logged_in"] = True
+                st.session_state["username"] = user["username"]
+                st.session_state["user_id"] = user["id"]
+
+                settings = get_user_settings(user["id"])
+                if settings:
+                    st.session_state["user_settings"] = settings
+                else:
+                    st.session_state["user_settings"] = {}
             else:
                 st.error("Username atau email sudah digunakan!")
+            st.switch_page("pages/7_Setup.py")
 
     st.markdown("---")
     st.caption("Sudah punya akun?")

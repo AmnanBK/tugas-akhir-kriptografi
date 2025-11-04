@@ -76,7 +76,6 @@ def init_db():
             vigenere_key TEXT,
             rsa_private TEXT,
             rsa_public TEXT,
-            vault_key TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
     """

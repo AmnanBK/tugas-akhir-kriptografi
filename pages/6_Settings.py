@@ -19,8 +19,8 @@ st.set_page_config(page_title="Pengaturan", layout="wide")
 
 
 def section_manage_keys(user_id):
-    st.subheader("🔐 Pengaturan Key")
-    st.info("Atur kunci enkripsi yang digunakan untuk operasi keamanan.")
+    st.subheader("🔐 Key yang Anda gunakan")
+    st.info("Detail Kunci Keamanan")
 
     user_settings = get_user_settings(user_id)
 
@@ -34,29 +34,13 @@ def section_manage_keys(user_id):
         if user_settings and user_settings["vigenere_key"]
         else ""
     )
-    vault_key = (
-        user_settings["vault_key"]
-        if user_settings and user_settings["vault_key"]
-        else ""
-    )
 
-    caesar_key = st.text_input("Masukkan Caesar Key", value=caesar_key, type="password")
+    caesar_key = st.text_input(
+        "Masukkan Caesar Key", value=caesar_key, type="password", disabled=True
+    )
     vigenere_key = st.text_input(
-        "Masukkan Vigenere Key", value=vigenere_key, type="password"
+        "Masukkan Vigenere Key", value=vigenere_key, type="password", disabled=True
     )
-    vault_key = st.text_input("Vault Key", value=vault_key, type="password")
-
-    if st.button("💾 Simpan Key"):
-        if caesar_key and vigenere_key and vault_key:
-            update_user_settings(
-                user_id=user_id,
-                caesar_key=caesar_key,
-                vigenere_key=vigenere_key,
-                vault_key=vault_key,
-            )
-            st.success("✅ Semua key berhasil disimpan!")
-        else:
-            st.warning("⚠️ Semua key harus diisi!")
 
 
 def section_change_password(user_id):

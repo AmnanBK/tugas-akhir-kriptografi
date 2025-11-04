@@ -6,7 +6,6 @@ from database.db_connection import get_connection
 
 DEFAULT_CAESAR_KEY = 3
 DEFAULT_VIGENERE_KEY = "SECRET"
-DEFAULT_VAULT_KEY = "SECRET"
 
 
 # CREATE - Tambah / Inisialisasi Pengaturan Default untuk User Baru
@@ -21,7 +20,7 @@ def create_user_settings(user_id: int) -> bool:
             cursor.execute(
                 """
                 INSERT OR IGNORE INTO settings
-                (user_id, caesar_key, vigenere_key, rsa_private, rsa_public, vault_key)
+                (user_id, caesar_key, vigenere_key, rsa_private, rsa_public)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -30,7 +29,6 @@ def create_user_settings(user_id: int) -> bool:
                     DEFAULT_VIGENERE_KEY,
                     rsa_private_str,
                     rsa_public_str,
-                    DEFAULT_VAULT_KEY,
                 ),
             )
             conn.commit()
@@ -47,7 +45,7 @@ def get_user_settings(user_id: int) -> dict | None:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT id, caesar_key, vigenere_key, rsa_private, rsa_public, vault_key
+                SELECT id, caesar_key, vigenere_key, rsa_private, rsa_public
                 FROM settings
                 WHERE user_id = ?
                 """,
@@ -74,7 +72,6 @@ def get_user_settings(user_id: int) -> dict | None:
                     "vigenere_key": row[2],
                     "rsa_private": rsa_private,
                     "rsa_public": rsa_public,
-                    "vault_key": row[5],
                 }
             return None
     except sqlite3.Error as e:
@@ -89,7 +86,6 @@ def update_user_settings(
     vigenere_key: str | None = None,
     rsa_private: str | None = None,
     rsa_public: str | None = None,
-    vault_key: str | None = None,
 ) -> bool:
     try:
         with get_connection() as conn:
@@ -110,9 +106,6 @@ def update_user_settings(
             if rsa_public is not None:
                 fields.append("rsa_public = ?")
                 values.append(rsa_public)
-            if vault_key is not None:
-                fields.append("vault_key = ?")
-                values.append(vault_key)
 
             if not fields:
                 return False
